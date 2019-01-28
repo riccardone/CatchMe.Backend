@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CatchMe.Domain.Aggregates.ValueObjects;
 using CatchMe.Domain.Commands;
 using CatchMe.Domain.Events;
 using Evento;
@@ -15,7 +16,6 @@ namespace CatchMe.Domain.Aggregates
         public PositionTracker()
         {
             _positions = new Dictionary<DateTime, Position>();
-            RegisterTransition<TrackingPositionStartedV1>(Apply);
             RegisterTransition<GeoInfoUpdatedV1>(Apply);
         }
 
@@ -35,7 +35,7 @@ namespace CatchMe.Domain.Aggregates
                 new Position(obj.Longitude, obj.Latitude, obj.Speed, obj.Heading, obj.Altitude));
         }
 
-        public static PositionTracker Start(StartTrackingPosition command)
+        public static PositionTracker Start(SaveGeoInfo command)
         {
             ValidateRequiredMetadata(command);
 

@@ -1,4 +1,4 @@
-﻿namespace CatchMe.Domain.Aggregates
+﻿namespace CatchMe.Domain.Aggregates.ValueObjects
 {
     public class Position
     {
