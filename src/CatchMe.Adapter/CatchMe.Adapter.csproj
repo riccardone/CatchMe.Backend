@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Evento" Version="4.1.0" />
-    <PackageReference Include="EventStore.Client" Version="4.1.1" />
+    <PackageReference Include="EventStore.Client" Version="5.0.0-rc2" />
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Microsoft.Csharp" Version="4.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />

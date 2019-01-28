@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Evento.Repository" Version="4.1.0" />
+    <PackageReference Include="Evento.Repository" Version="4.1.1" />
   </ItemGroup>
 
   <ItemGroup>
