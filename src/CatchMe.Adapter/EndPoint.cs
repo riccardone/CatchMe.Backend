@@ -6,13 +6,13 @@ using CatchMe.Adapter.Mappings;
 using CatchMe.Domain.Commands;
 using Evento;
 using EventStore.ClientAPI;
-using log4net;
+using NLog;
 
 namespace CatchMe.Adapter
 {
     public class EndPoint
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(EndPoint));
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly IDomainRepository _domainRepository;
         private IEventStoreConnection _connection;
         private readonly IConnectionBuilder _connectionBuilder;
