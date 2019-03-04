@@ -1,6 +1,7 @@
 ﻿using CatchMe.Domain.Aggregates;
 using CatchMe.Domain.Commands;
 using Evento;
+using NLog;
 
 namespace CatchMe.Adapter
 {
@@ -10,6 +11,7 @@ namespace CatchMe.Adapter
         IHandle<DisconnectFriend>,
         IHandle<SaveGeoInfo>
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly IDomainRepository _repository;
 
         public Handlers(IDomainRepository repository)
