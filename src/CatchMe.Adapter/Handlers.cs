@@ -53,12 +53,12 @@ namespace CatchMe.Adapter
             try
             {
                 aggregate = _repository.GetById<PositionTracker>(command.Metadata["$correlationId"], 5);
-                aggregate.Track(command);
             }
             catch (AggregateNotFoundException)
             {
                 aggregate = PositionTracker.Start(command);
             }
+            aggregate.Track(command);
             return aggregate;
         }
     }

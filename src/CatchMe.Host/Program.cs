@@ -13,13 +13,21 @@ namespace CatchMe.Host
 
         static void Main(string[] args)
         {
-            ConfigureLogging();
-            var connBuilder = new ConnectionBuilder(new Uri("tcp://eventstore:1113"), ConnectionSettings.Default, "catchme-subscriber",
-                new UserCredentials("admin", "changeit"));
-            var repo = new EventStoreDomainRepository("catchme", connBuilder.Build());
-            var endpoint = new EndPoint(repo, connBuilder, new Handlers(repo));
-            endpoint.Start();
-
+            try
+            {
+                ConfigureLogging();
+                var subscriber = new ConnectionBuilder(new Uri("tcp://eventstore:1113"), ConnectionSettings.Default, "catchme-subscriber",
+                    new UserCredentials("admin", "changeit"));
+                var processing = new ConnectionBuilder(new Uri("tcp://eventstore:1113"), ConnectionSettings.Default, "catchme-processing",
+                    new UserCredentials("admin", "changeit"));
+                var repo = new EventStoreDomainRepository("catchme", processing.Build(true));
+                var endpoint = new EndPoint(repo, subscriber, new Handlers(repo));
+                endpoint.Start().Wait();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.GetBaseException().Message);
+            }
             Log.Info("Press enter to exit");
             Console.ReadLine();
         }

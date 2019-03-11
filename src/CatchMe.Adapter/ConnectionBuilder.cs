@@ -11,9 +11,13 @@ namespace CatchMe.Adapter
         public string ConnectionName { get; }
         public UserCredentials Credentials { get; }
 
-        public IEventStoreConnection Build()
+        public IEventStoreConnection Build(bool open = false)
         {
-            return EventStoreConnection.Create(ConnectionSettings, ConnectionString, ConnectionName);
+            var connection = EventStoreConnection.Create(ConnectionSettings, ConnectionString, ConnectionName);
+            if (open)
+                connection.ConnectAsync().Wait();
+
+            return connection;
         }
 
         public ConnectionBuilder(Uri connectionString, ConnectionSettings connectionSettings, string connectionName, UserCredentials credentials)

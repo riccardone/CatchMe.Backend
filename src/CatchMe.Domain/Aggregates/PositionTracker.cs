@@ -16,6 +16,7 @@ namespace CatchMe.Domain.Aggregates
         public PositionTracker()
         {
             _positions = new Dictionary<DateTime, Position>();
+            RegisterTransition<TrackingPositionStartedV1>(Apply);
             RegisterTransition<GeoInfoUpdatedV1>(Apply);
         }
 
@@ -31,7 +32,7 @@ namespace CatchMe.Domain.Aggregates
 
         private void Apply(GeoInfoUpdatedV1 obj)
         {
-            _positions.Add(DateTime.Parse(obj.Metadata["Applies"]),
+            _positions.Add(DateTime.Parse(obj.Metadata["applies"]),
                 new Position(obj.Longitude, obj.Latitude, obj.Speed, obj.Heading, obj.Altitude));
         }
 
@@ -47,14 +48,14 @@ namespace CatchMe.Domain.Aggregates
             ValidateRequiredMetadata(command);
 
             RaiseEvent(new GeoInfoUpdatedV1(command.Longitude, command.Latitude, command.Speed, command.Heading,
-                command.Altitude, command.Metadata));
+                command.Altitude, command.Timestamp, command.Accuracy, command.Metadata));
         }
 
         private static void ValidateRequiredMetadata(Message msg)
         {
             Ensure.NotNull(msg.Metadata, nameof(msg.Metadata));
             Ensure.NotNullOrWhiteSpace(msg.Metadata["$correlationId"], "$correlationId");
-            Ensure.NotNullOrWhiteSpace(msg.Metadata["Applies"], "Applies");
+            Ensure.NotNullOrWhiteSpace(msg.Metadata["applies"], "applies");
         }
     }
 }
