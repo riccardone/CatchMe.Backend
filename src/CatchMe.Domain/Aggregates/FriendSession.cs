@@ -26,13 +26,13 @@ namespace CatchMe.Domain.Aggregates
         private void Apply(FriendDisconnectedV1 obj)
         {
             _active = false;
-            _disconnectedAt = DateTime.Parse(obj.Metadata["Applies"]);
+            _disconnectedAt = DateTime.Parse(obj.Metadata["applies"]);
         }
 
         private void Apply(ConnectionAcceptedV1 obj)
         {
             _active = true;
-            _connectionEstablishedAt = DateTime.Parse(obj.Metadata["Applies"]);
+            _connectionEstablishedAt = DateTime.Parse(obj.Metadata["applies"]);
         }
 
         public FriendSession(string ownerId, string friendId, IDictionary<string, string> metadata) : this()
@@ -79,7 +79,7 @@ namespace CatchMe.Domain.Aggregates
         {
             Ensure.NotNull(msg.Metadata, nameof(msg.Metadata));
             Ensure.NotNullOrWhiteSpace(msg.Metadata["$correlationId"], "$correlationId");
-            Ensure.NotNullOrWhiteSpace(msg.Metadata["Applies"], "Applies");
+            Ensure.NotNullOrWhiteSpace(msg.Metadata["Applies"], "applies");
         }
     }
 }

@@ -6,13 +6,13 @@ using CatchMe.Adapter.Mappings;
 using CatchMe.Domain.Commands;
 using Evento;
 using EventStore.ClientAPI;
-using log4net;
+using NLog;
 
 namespace CatchMe.Adapter
 {
     public class EndPoint
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(EndPoint));
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly IDomainRepository _domainRepository;
         private IEventStoreConnection _connection;
         private readonly IConnectionBuilder _connectionBuilder;
@@ -31,28 +31,19 @@ namespace CatchMe.Adapter
             _handlers = handlers;
         }
 
-        public bool Start()
+        public async Task Start()
         {
-            try
-            {
-                _connection = _connectionBuilder.Build();
-                _connection.Connected += _connection_Connected;
-                _connection.Disconnected += _connection_Disconnected;
-                _connection.ErrorOccurred += _connection_ErrorOccurred;
-                _connection.Closed += _connection_Closed;
-                _connection.Reconnecting += _connection_Reconnecting;
-                _connection.AuthenticationFailed += _connection_AuthenticationFailed;
-                _connection.ConnectAsync();
-                Log.Info($"Listening from '{InputStream}' stream");
-                Log.Info($"Joined '{PersistentSubscriptionGroup}' group");
-                Log.Info($"Log EndPoint started");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex);
-                return false;
-            }
+            _connection = _connectionBuilder.Build();
+            _connection.Connected += _connection_Connected;
+            _connection.Disconnected += _connection_Disconnected;
+            _connection.ErrorOccurred += _connection_ErrorOccurred;
+            _connection.Closed += _connection_Closed;
+            _connection.Reconnecting += _connection_Reconnecting;
+            _connection.AuthenticationFailed += _connection_AuthenticationFailed;
+            await _connection.ConnectAsync();
+            Log.Info($"Listening from '{InputStream}' stream");
+            Log.Info($"Joined '{PersistentSubscriptionGroup}' group");
+            Log.Info($"Log EndPoint started");
         }
 
         private void _connection_AuthenticationFailed(object sender, ClientAuthenticationFailedEventArgs e)
@@ -164,20 +155,20 @@ namespace CatchMe.Adapter
         {
             return new Dictionary<string, Func<string[], Command>>
             {
-                {"SendConnectionRequest", ToSendConnectionRequest}
+                {"PositionReceived", ToSaveGeoInfo}
             };
         }
         private Dictionary<string, Func<object, IAggregate>> CreateEventHandlerMapping()
         {
             return new Dictionary<string, Func<object, IAggregate>>
             {
-                {"SendConnectionRequest", o => _handlers.Handle(o as SendConnectionRequest)}
+                {"PositionReceived", o => _handlers.Handle(o as SaveGeoInfo)}
             };
         }
 
-        private static Command ToSendConnectionRequest(string[] arg)
+        private static Command ToSaveGeoInfo(string[] arg)
         {
-            return new SendConnectionRequestFromJson(arg[1], arg[0]);
+            return new SaveGeoInfoFromJson(arg[1], arg[0]);
         }
     }
 }

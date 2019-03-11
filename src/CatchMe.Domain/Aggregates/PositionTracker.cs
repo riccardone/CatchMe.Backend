@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CatchMe.Domain.Aggregates.ValueObjects;
 using CatchMe.Domain.Commands;
 using CatchMe.Domain.Events;
 using Evento;
@@ -31,11 +32,11 @@ namespace CatchMe.Domain.Aggregates
 
         private void Apply(GeoInfoUpdatedV1 obj)
         {
-            _positions.Add(DateTime.Parse(obj.Metadata["Applies"]),
+            _positions.Add(DateTime.Parse(obj.Metadata["applies"]),
                 new Position(obj.Longitude, obj.Latitude, obj.Speed, obj.Heading, obj.Altitude));
         }
 
-        public static PositionTracker Start(StartTrackingPosition command)
+        public static PositionTracker Start(SaveGeoInfo command)
         {
             ValidateRequiredMetadata(command);
 
@@ -47,14 +48,14 @@ namespace CatchMe.Domain.Aggregates
             ValidateRequiredMetadata(command);
 
             RaiseEvent(new GeoInfoUpdatedV1(command.Longitude, command.Latitude, command.Speed, command.Heading,
-                command.Altitude, command.Metadata));
+                command.Altitude, command.Timestamp, command.Accuracy, command.Metadata));
         }
 
         private static void ValidateRequiredMetadata(Message msg)
         {
             Ensure.NotNull(msg.Metadata, nameof(msg.Metadata));
             Ensure.NotNullOrWhiteSpace(msg.Metadata["$correlationId"], "$correlationId");
-            Ensure.NotNullOrWhiteSpace(msg.Metadata["Applies"], "Applies");
+            Ensure.NotNullOrWhiteSpace(msg.Metadata["applies"], "applies");
         }
     }
 }

@@ -10,6 +10,6 @@ namespace CatchMe.Adapter
         ConnectionSettings ConnectionSettings { get; }
         string ConnectionName { get; }
         UserCredentials Credentials { get; }
-        IEventStoreConnection Build();
+        IEventStoreConnection Build(bool open = false);
     }
 }

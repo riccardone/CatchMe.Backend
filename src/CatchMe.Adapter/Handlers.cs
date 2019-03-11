@@ -1,7 +1,7 @@
-﻿using System;
-using CatchMe.Domain.Aggregates;
+﻿using CatchMe.Domain.Aggregates;
 using CatchMe.Domain.Commands;
 using Evento;
+using NLog;
 
 namespace CatchMe.Adapter
 {
@@ -9,16 +9,14 @@ namespace CatchMe.Adapter
         IHandle<SendConnectionRequest>,
         IHandle<AcceptConnectionRequest>,
         IHandle<DisconnectFriend>,
-        IHandle<SaveGeoInfo>,
-        IHandle<StartTrackingPosition>
+        IHandle<SaveGeoInfo>
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly IDomainRepository _repository;
-        //private readonly IDiaryCache _diaryCache;
 
         public Handlers(IDomainRepository repository)
         {
             _repository = repository;
-            //_diaryCache = diaryCache;
         }
 
         public IAggregate Handle(SendConnectionRequest command)
@@ -37,22 +35,31 @@ namespace CatchMe.Adapter
 
         public IAggregate Handle(AcceptConnectionRequest command)
         {
-            throw new NotImplementedException();
+            var aggregate = _repository.GetById<FriendSession>(command.Metadata["$correlationId"], 5);
+            aggregate.AcceptConnectionRequest(command);
+            return aggregate;
         }
 
         public IAggregate Handle(DisconnectFriend command)
         {
-            throw new NotImplementedException();
+            var aggregate = _repository.GetById<FriendSession>(command.Metadata["$correlationId"], 5);
+            aggregate.Disconnect(command);
+            return aggregate;
         }
 
         public IAggregate Handle(SaveGeoInfo command)
         {
-            throw new NotImplementedException();
-        }
-
-        public IAggregate Handle(StartTrackingPosition command)
-        {
-            throw new NotImplementedException();
+            PositionTracker aggregate;
+            try
+            {
+                aggregate = _repository.GetById<PositionTracker>(command.Metadata["$correlationId"], 5);
+            }
+            catch (AggregateNotFoundException)
+            {
+                aggregate = PositionTracker.Start(command);
+            }
+            aggregate.Track(command);
+            return aggregate;
         }
     }
 }
